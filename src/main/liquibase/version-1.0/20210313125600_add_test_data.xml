@@ -5,7 +5,7 @@
         logicalFilePath="20210313125600_add_test_data.xml">
 
     <changeSet id="20210313125600" author="ihar_smolka@senla.eu">
-        <insert tableName="USER">
+        <insert tableName="USER_PROFILE">
             <column name="USERNAME" value="mainuser"/>
             <column name="PASSWORD" value="111111"/>
             <column name="EMAIL" value="1111111@mail.ru"/>

@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "USER_PROFILE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

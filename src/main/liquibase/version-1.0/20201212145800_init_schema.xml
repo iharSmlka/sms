@@ -6,7 +6,7 @@
 
     <changeSet id="20201212145800" author="ihar_smolka@senla.eu">
 
-        <createTable tableName="USER">
+        <createTable tableName="USER_PROFILE">
             <column name="ID" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
