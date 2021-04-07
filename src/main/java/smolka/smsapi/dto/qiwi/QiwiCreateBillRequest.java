@@ -13,9 +13,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 public class QiwiCreateBillRequest {
-    private String billId;
     private QiwiAmountDto amount;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mmZ", timezone = "UTC")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
     private ZonedDateTime expirationDateTime;
     private String account;
 }
