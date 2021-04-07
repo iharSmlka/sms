@@ -1,0 +1,123 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
+        logicalFilePath="20201212145800_init_schema.xml">
+
+    <changeSet id="20201212145800" author="ihar_smolka@senla.eu">
+
+        <createTable tableName="USER">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="USERNAME" type="VARCHAR(50)">
+                <constraints unique="true"/>
+            </column>
+            <column name="PASSWORD" type="VARCHAR(150)"/>
+            <column name="EMAIL" type="VARCHAR(254)">
+                <constraints unique="true"/>
+            </column>
+            <column name="USER_KEY" type="VARCHAR(500)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="BALANCE" type="DECIMAL(23,5)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="FREEZE_BALANCE" type="DECIMAL(23,5)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="COUNTRY">
+            <column name="ID" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="CODE" type="VARCHAR(20)">
+                <constraints unique="true"/>
+            </column>
+            <column name="SMSHUB_CODE" type="VARCHAR(20)">
+                <constraints unique="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="TARGET_SERVICE">
+            <column name="ID" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="CODE" type="VARCHAR(20)">
+                <constraints unique="true"/>
+            </column>
+            <column name="SMSHUB_CODE" type="VARCHAR(20)">
+                <constraints unique="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="CURRENT_ACTIVATION">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="USER_ID" type="BIGINT"/>
+            <column name="START_DATE" type="DATETIME"/>
+            <column name="PLANNED_CLOSE_DATE" type="DATETIME"/>
+            <column name="STATUS" type="INTEGER"/>
+            <column name="NUMBER" type="VARCHAR(100)"/>
+            <column name="MESSAGE" type="VARCHAR(1000)"/>
+
+            <column name="COUNTRY_ID" type="INT"/>
+            <column name="SERVICE_ID" type="INT"/>
+
+            <column name="SOURCE_NAME" type="VARCHAR(20)"/>
+            <column name="SOURCE_ID" type="BIGINT"/>
+            <column name="COST" type="DECIMAL(23,5)"/>
+        </createTable>
+
+        <createTable tableName="ACTIVATION_HISTORY">
+            <column name="ID" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="USER_ID" type="BIGINT"/>
+            <column name="START_DATE" type="DATETIME"/>
+            <column name="CLOSE_DATE" type="DATETIME"/>
+            <column name="STATUS" type="INTEGER"/>
+            <column name="NUMBER" type="VARCHAR(100)"/>
+            <column name="MESSAGE" type="VARCHAR(1000)"/>
+
+            <column name="COUNTRY_ID" type="INT"/>
+            <column name="SERVICE_ID" type="INT"/>
+
+            <column name="SOURCE_NAME" type="VARCHAR(20)"/>
+            <column name="SOURCE_ID" type="BIGINT"/>
+            <column name="COST" type="DECIMAL(23,5)"/>
+        </createTable>
+
+        <createTable tableName="PARAMS_DICT">
+            <column name="PARAM_NAME" type="VARCHAR(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="PARAM_VALUE" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="BILL">
+            <column name="ID" type="VARCHAR(500)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="USER_ID" type="BIGINT"/>
+            <column name="AMOUNT" type="DECIMAL(6,2)"/>
+            <column name="CREATE_DATE" type="DATETIME"/>
+            <column name="PLANNED_CLOSE_DATE" type="DATETIME"/>
+            <column name="CLOSE_DATE" type="DATETIME"/>
+            <column name="IS_PAID" type="BOOLEAN"/>
+            <column name="SERVICE" type="VARCHAR(50)"/>
+        </createTable>
+
+        <addUniqueConstraint clustered="false"
+                             columnNames="SOURCE_NAME, SOURCE_ID"
+                             constraintName="activ_unique_const"
+                             tableName="CURRENT_ACTIVATION"
+                             validate="true"/>
+    </changeSet>
+</databaseChangeLog>

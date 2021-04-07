@@ -1,0 +1,30 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
+        logicalFilePath="20210313125600_add_test_data.xml">
+
+    <changeSet id="20210313125600" author="ihar_smolka@senla.eu">
+        <insert tableName="USER">
+            <column name="USERNAME" value="mainuser"/>
+            <column name="PASSWORD" value="111111"/>
+            <column name="EMAIL" value="1111111@mail.ru"/>
+            <column name="USER_KEY" value="123456"/>
+            <column name="BALANCE" value="20000"/>
+            <column name="FREEZE_BALANCE" value="0"/>
+        </insert>
+        <insert tableName="PARAMS_DICT">
+            <column name="PARAM_NAME" value="SECRET_KEY_QIWI"/>
+            <column name="PARAM_VALUE"
+                    value="eyJ2ZXJzaW9uIjoiUDJQIiwiZGF0YSI6eyJwYXlpbl9tZXJjaGFudF9zaXRlX3VpZCI6ImJ0b21kbS0wMCIsInVzZXJfaWQiOiI3OTkxNTIxNzQ0MiIsInNlY3JldCI6ImUxNWY4YmE5M2JkNmEyNDAxZDg5YTkxOGRjZTgzNTdjMmViZjE2Y2U2M2ExOTEwODQ0NGQyOTc1MTBhNzBkY2UifX0="/>
+        </insert>
+        <insert tableName="PARAMS_DICT">
+            <column name="PARAM_NAME" value="PERCENTAGE_MARK_UPPER"/>
+            <column name="PARAM_VALUE" value="10"/>
+        </insert>
+        <insert tableName="PARAMS_DICT">
+            <column name="PARAM_NAME" value="SMS_HUB_API_KEY"/>
+            <column name="PARAM_VALUE" value="10"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
