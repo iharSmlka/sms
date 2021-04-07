@@ -34,7 +34,7 @@ public class MainMapper {
 
     private static final Integer PAGE_NUMBER_DEFAULT = 0;
     private static final Integer PAGE_SIZE_DEFAULT = 1000;
-    private static final String RUS_RUB_CURRENCY_ID = "643";
+    private static final String RUS_RUB_CURRENCY_ID = "RUB";
     @Value(value = "${sms.api.bigdecimal_scaling}")
     private Integer scale;
     @Autowired
