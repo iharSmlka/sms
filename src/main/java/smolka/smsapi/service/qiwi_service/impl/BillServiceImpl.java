@@ -84,7 +84,7 @@ public class BillServiceImpl implements BillService {
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new Exception("ошибка при общении с QIWI ");
             }
-            return mainMapper.mapping(response.getBody(), QiwiCreateBillResponse.class);
+            return mainMapper.mapQiwiCreateBillResponseFromString(response.getBody());
         } catch (Exception exc) {
             throw new PaymentSystemException("ошибка при общении с QIWI ", response);
         }

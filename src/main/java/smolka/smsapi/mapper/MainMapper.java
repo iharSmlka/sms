@@ -1,5 +1,7 @@
 package smolka.smsapi.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import smolka.smsapi.dto.*;
 import smolka.smsapi.dto.input.CustomPageableRequest;
 import smolka.smsapi.dto.qiwi.QiwiBillCustomerDto;
+import smolka.smsapi.dto.qiwi.QiwiCreateBillResponse;
 import smolka.smsapi.dto.qiwi.input.QiwiAddBalanceRequest;
 import smolka.smsapi.dto.qiwi.QiwiAmountDto;
 import smolka.smsapi.dto.qiwi.QiwiCreateBillRequest;
@@ -15,7 +18,6 @@ import smolka.smsapi.dto.receiver.ReceiverActivationInfoDto;
 import smolka.smsapi.dto.receiver.ReceiverActivationStatusDto;
 import smolka.smsapi.dto.receiver.ReceiverCostMapDto;
 import smolka.smsapi.enums.ActivationStatus;
-import smolka.smsapi.enums.BillStatus;
 import smolka.smsapi.enums.PaymentService;
 import smolka.smsapi.enums.SortDictionary;
 import smolka.smsapi.model.*;
@@ -39,6 +41,8 @@ public class MainMapper {
     private Integer scale;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public <E, D> D mapping(E object, Class<D> clazz) {
         if (object == null) {
@@ -181,6 +185,14 @@ public class MainMapper {
                 .customer(QiwiBillCustomerDto.builder().account(bill.getUser().getUserId().toString()).build())
                 .expirationDateTime(DateTimeUtils.toUtcZonedDateTime(bill.getCreateDate().plusMinutes(expMinutes)))
                 .build();
+    }
+
+    public QiwiCreateBillResponse mapQiwiCreateBillResponseFromString(String str) {
+        try {
+            return objectMapper.readValue(str, QiwiCreateBillResponse.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private CurrentActivationStatusDto mapActivationStatusFromActivation(CurrentActivation activation) {
