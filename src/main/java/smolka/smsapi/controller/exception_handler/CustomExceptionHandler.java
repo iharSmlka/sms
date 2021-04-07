@@ -58,4 +58,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ServiceMessage<String> serviceMessage = new ServiceMessage<>(SmsConstants.ERROR_STATUS.getValue(), e.getMessage());
         return new ResponseEntity<>(serviceMessage, HttpStatus.BAD_REQUEST);
     }
+
+
+    @ExceptionHandler(PaymentSystemException.class)
+    public ResponseEntity<String> handle(PaymentSystemException e) {
+        logger.error("Ошибка при оплате", e);
+        return new ResponseEntity<>("Ошибка при оплате", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
