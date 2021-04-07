@@ -17,16 +17,9 @@ public class QiwiBillNotificationBody {
         private String value;
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class QiwiBillCustomer {
-        private String account;
-    }
-
     private String siteId;
     private String billId;
     private QiwiAmountDto amount;
-    private QiwiBillCustomer customer;
+    private QiwiBillCustomerDto customer;
     private QiwiBillStatus status;
 }

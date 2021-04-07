@@ -7,6 +7,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import smolka.smsapi.dto.*;
 import smolka.smsapi.dto.input.CustomPageableRequest;
+import smolka.smsapi.dto.qiwi.QiwiBillCustomerDto;
 import smolka.smsapi.dto.qiwi.input.QiwiAddBalanceRequest;
 import smolka.smsapi.dto.qiwi.QiwiAmountDto;
 import smolka.smsapi.dto.qiwi.QiwiCreateBillRequest;
@@ -177,7 +178,7 @@ public class MainMapper {
                         .currency(RUS_RUB_CURRENCY_ID)
                         .value(bill.getAmount())
                         .build())
-                .account(bill.getUser().getUserId().toString())
+                .customer(QiwiBillCustomerDto.builder().account(bill.getUser().getUserId().toString()).build())
                 .expirationDateTime(DateTimeUtils.toUtcZonedDateTime(bill.getCreateDate().plusMinutes(expMinutes)))
                 .build();
     }
