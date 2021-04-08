@@ -20,8 +20,8 @@ public class ActivationTargetServiceImpl implements ActivationTargetService {
 
     @PostConstruct
     private void init() {
-        List<ActivationTarget> countries = activationTargetRepository.findAll();
-        countries.forEach(t -> {
+        List<ActivationTarget> services = activationTargetRepository.findAll();
+        services.forEach(t -> {
             activationTargetMap.put(t.getSmshubServiceCode(), t);
         });
     }
