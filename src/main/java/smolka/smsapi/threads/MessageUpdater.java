@@ -44,11 +44,8 @@ public class MessageUpdater extends Thread {
                 step();
             } catch (Exception e) {
                 log.error("Ошибка в MessageUpdater ", e);
-                break;
             }
         }
-        log.error("Умер MessageUpdater");
-        // TODO: здесь надо падать
     }
 
     private void setMessageForActivationsStep() throws ReceiverException {
