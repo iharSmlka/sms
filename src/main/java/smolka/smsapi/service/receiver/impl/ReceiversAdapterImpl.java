@@ -31,7 +31,7 @@ public class ReceiversAdapterImpl implements ReceiversAdapter {
 
     @Override
     public CostMapDto getCommonCostMap(Country country) throws ReceiverException {
-        return markUpperService.markUp(mainMapper.mapToInternalCostMap(smsHubReceiver.getCostMap(country))); // пока что тут будет только получение инфы с СМС-хаба, т.к другие сервисы пока интегрировать рано
+        return markUpperService.markUpCostMap(mainMapper.mapToInternalCostMap(smsHubReceiver.getCostMap(country))); // пока что тут будет только получение инфы с СМС-хаба, т.к другие сервисы пока интегрировать рано
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ReceiversAdapterImpl implements ReceiversAdapter {
             return null;
         }
         ReceiverActivationInfoDto activationInfoDto = receiver.orderActivation(country, service);
-        activationInfoDto.setCost(minCost);
+        activationInfoDto.setCost(markUpperService.markUp(minCost));
         return activationInfoDto;
     }
 }

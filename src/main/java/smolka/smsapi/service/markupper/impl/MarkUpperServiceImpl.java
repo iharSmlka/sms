@@ -38,7 +38,7 @@ public class MarkUpperServiceImpl implements MarkUpperService {
     }
 
     @Override
-    public CostMapDto markUp(CostMapDto costMapDto) {
+    public CostMapDto markUpCostMap(CostMapDto costMapDto) {
         Integer percentage = percentageCashedValue;
         if (percentage == 0) {
             return costMapDto;
@@ -49,11 +49,20 @@ public class MarkUpperServiceImpl implements MarkUpperService {
                 Map<BigDecimal, Integer> costs = costMapDto.getCostMap().get(country).get(srv);
                 for (BigDecimal val : costs.keySet()) {
                     Integer tmpCount = costs.get(val);
-                    newCostMapDto.put(country, srv, val.add(percentage(val, percentage)).setScale(scale, RoundingMode.CEILING), tmpCount);
+                    newCostMapDto.put(country, srv, markUp(val), tmpCount);
                 }
             }
         }
         return costMapDto;
+    }
+
+    @Override
+    public BigDecimal markUp(BigDecimal cost) {
+        Integer percentage = percentageCashedValue;
+        if (percentage == 0) {
+            return cost;
+        }
+        return cost.add(percentage(cost, percentage)).setScale(scale, RoundingMode.CEILING);
     }
 
     private BigDecimal percentage(BigDecimal base, Integer pct) {
