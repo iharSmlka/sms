@@ -16,7 +16,7 @@
         <insert tableName="PARAMS_DICT">
             <column name="PARAM_NAME" value="SECRET_KEY_QIWI"/>
             <column name="PARAM_VALUE"
-                    value="eyJ2ZXJzaW9uIjoiUDJQIiwiZGF0YSI6eyJwYXlpbl9tZXJjaGFudF9zaXRlX3VpZCI6ImJ0b21kbS0wMCIsInVzZXJfaWQiOiI3OTkxNTIxNzQ0MiIsInNlY3JldCI6ImUxNWY4YmE5M2JkNmEyNDAxZDg5YTkxOGRjZTgzNTdjMmViZjE2Y2U2M2ExOTEwODQ0NGQyOTc1MTBhNzBkY2UifX0="/>
+                    value="eyJ2ZXJzaW9uIjoiUDJQIiwiZGF0YSI6eyJwYXlpbl9tZXJjaGFudF9zaXRlX3VpZCI6ImJ0b21kbS0wMCIsInVzZXJfaWQiOiI3OTkxNTIxNzQ0MiIsInNlY3JldCI6ImViMDQ5ZjMzNjdhMDBiMzlmZTYyMWE2ODUzMWYwZjY4ZWQ0ZjA3NGE4YzFkNjM4Yjk1Yzc0NWYzNDhmMGE0ZTkifX0="/>
         </insert>
         <insert tableName="PARAMS_DICT">
             <column name="PARAM_NAME" value="PERCENTAGE_MARK_UPPER"/>
