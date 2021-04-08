@@ -25,17 +25,11 @@ public class ReceiverCostMapDto {
         costMap.get(country).get(service).put(cost, count);
     }
 
-    public boolean isExists(Country country, ActivationTarget activationTarget, BigDecimal cost) {
+    public BigDecimal getMinCost(Country country, ActivationTarget activationTarget, BigDecimal cost) {
         if (costMap.get(country) == null || costMap.get(country).get(activationTarget) == null) {
-            return false;
+            return null;
         }
         Map<BigDecimal, Integer> costs = costMap.get(country).get(activationTarget);
-        for (BigDecimal costInMap : costs.keySet()) {
-            int compareResult = costInMap.compareTo(cost);
-            if (compareResult == 0 || compareResult < 0) {
-                return true;
-            }
-        }
-        return false;
+        return costs.keySet().stream().filter(c -> c.compareTo(cost) <= 0).min(BigDecimal::compareTo).orElse(null);
     }
 }

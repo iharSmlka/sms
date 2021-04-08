@@ -126,7 +126,6 @@ public class MainMapper {
                                                         User user,
                                                         Country country,
                                                         ActivationTarget service,
-                                                        BigDecimal cost,
                                                         Integer minutesForActivation) {
         LocalDateTime createDate = DateTimeUtils.getUtcCurrentLocalDateTime();
         return CurrentActivation.builder()
@@ -140,7 +139,7 @@ public class MainMapper {
                 .plannedFinishDate(createDate.plusMinutes(minutesForActivation))
                 .sourceId(receiverActivationInfo.getId())
                 .status(ActivationStatus.ACTIVE.getCode())
-                .cost(cost)
+                .cost(receiverActivationInfo.getCost())
                 .build();
     }
 

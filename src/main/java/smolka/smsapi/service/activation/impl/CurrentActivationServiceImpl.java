@@ -71,10 +71,10 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
         ActivationTarget service = activationTargetRepository.findByServiceCode(orderRequest.getService());
         Country country = countryRepository.findByCountryCode(orderRequest.getCountry());
         ReceiverActivationInfoDto receiverActivationInfo = receiversAdapter.orderAttempt(country, service, orderRequest.getCost());
-        CurrentActivation newActivation = mainMapper.createNewCurrentActivation(receiverActivationInfo, user, country, service, orderRequest.getCost(), minutesForActivation);
+        CurrentActivation newActivation = mainMapper.createNewCurrentActivation(receiverActivationInfo, user, country, service, minutesForActivation);
         currentActivationRepository.save(newActivation);
         CurrentActivationCreateInfoDto activationInfo = mainMapper.mapActivationInfoFromActivation(newActivation);
-        balanceSyncService.subFromRealBalanceAndAddToFreeze(user, orderRequest.getCost());
+        balanceSyncService.subFromRealBalanceAndAddToFreeze(user, receiverActivationInfo.getCost());
         return activationInfo;
     }
 

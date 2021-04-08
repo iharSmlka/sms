@@ -36,7 +36,11 @@ public class ReceiversAdapterImpl implements ReceiversAdapter {
 
     @Override
     public ReceiverActivationInfoDto orderAttempt(Country country, ActivationTarget service, BigDecimal cost) throws ReceiverException, NoNumbersException {
-        return attemptToSmsHub(country, service, cost);
+        ReceiverActivationInfoDto activationInfoDto = attemptToSmsHub(country, service, cost);
+        if (activationInfoDto == null) {
+            throw new NoNumbersException("Нету доступных номеров");
+        }
+        return activationInfoDto;
     }
 
     @Override
@@ -45,15 +49,18 @@ public class ReceiversAdapterImpl implements ReceiversAdapter {
         return mainMapper.getCommonReceiversActivationInfoMapFromReceiversActivationsList(receiverActivationStatusList);
     }
 
-    private ReceiverActivationInfoDto attemptToSmsHub(Country country, ActivationTarget service, BigDecimal cost) throws ReceiverException, NoNumbersException {
-        ReceiverCostMapDto costMap = getCostMapFromSmsHub(country);
-        if (!costMap.isExists(country, service, cost)) {
-            throw new NoNumbersException("Нет доступных номеров");
-        }
-        return smsHubReceiver.orderActivation(country, service);
+    private ReceiverActivationInfoDto attemptToSmsHub(Country country, ActivationTarget service, BigDecimal cost) throws ReceiverException {
+        return getReceiverActivationWithActualCost(smsHubReceiver, country, service, cost);
     }
 
-    private ReceiverCostMapDto getCostMapFromSmsHub(Country country) throws ReceiverException {
-        return smsHubReceiver.getCostMap(country);
+    private ReceiverActivationInfoDto getReceiverActivationWithActualCost(RestReceiver receiver, Country country, ActivationTarget service, BigDecimal cost) throws ReceiverException {
+        ReceiverCostMapDto costMap = receiver.getCostMap(country);
+        BigDecimal minCost = costMap.getMinCost(country, service, cost);
+        if (minCost == null) {
+            return null;
+        }
+        ReceiverActivationInfoDto activationInfoDto = receiver.orderActivation(country, service);
+        activationInfoDto.setCost(minCost);
+        return activationInfoDto;
     }
 }
