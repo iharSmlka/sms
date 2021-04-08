@@ -30,6 +30,12 @@ public class CostMapDto {
         return false;
     }
 
+    public void put(String country, String service, BigDecimal cost, Integer count) {
+        costMap.computeIfAbsent(country, k -> new HashMap<>());
+        costMap.get(country).computeIfAbsent(service, k -> new HashMap<>());
+        costMap.get(country).get(service).put(cost, count);
+    }
+
     public void addCostToMapWithAdd(Country country, ActivationTarget service, BigDecimal cost, Integer count) {
         costMap.computeIfAbsent(country.getCountryCode(), c -> new HashMap<>());
         costMap.get(country.getCountryCode()).computeIfAbsent(service.getServiceCode(), k -> new HashMap<>());

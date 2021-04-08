@@ -24,7 +24,7 @@
         </insert>
         <insert tableName="PARAMS_DICT">
             <column name="PARAM_NAME" value="SMS_HUB_API_KEY"/>
-            <column name="PARAM_VALUE" value="10"/>
+            <column name="PARAM_VALUE" value="77483U6e839a0e047df72b866a17a94872022f"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

@@ -11,6 +11,7 @@ import smolka.smsapi.service.parameters_service.ParametersService;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -42,13 +43,13 @@ public class MarkUpperServiceImpl implements MarkUpperService {
         if (percentage == 0) {
             return costMapDto;
         }
+        CostMapDto newCostMapDto = new CostMapDto();
         for (String country : costMapDto.getCostMap().keySet()) {
             for (String srv : costMapDto.getCostMap().get(country).keySet()) {
                 Map<BigDecimal, Integer> costs = costMapDto.getCostMap().get(country).get(srv);
                 for (BigDecimal val : costs.keySet()) {
                     Integer tmpCount = costs.get(val);
-                    costs.put(val.add(percentage(val, percentage)).setScale(scale, RoundingMode.CEILING), tmpCount);
-                    costs.remove(val);
+                    newCostMapDto.put(country, srv, val.add(percentage(val, percentage)).setScale(scale, RoundingMode.CEILING), tmpCount);
                 }
             }
         }
