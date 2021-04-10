@@ -24,12 +24,4 @@ public class ReceiverCostMapDto {
         costMap.get(country).computeIfAbsent(service, k -> new HashMap<>());
         costMap.get(country).get(service).put(cost, count);
     }
-
-    public BigDecimal getMinCost(Country country, ActivationTarget activationTarget, BigDecimal cost) {
-        if (costMap.get(country) == null || costMap.get(country).get(activationTarget) == null) {
-            return null;
-        }
-        Map<BigDecimal, Integer> costs = costMap.get(country).get(activationTarget);
-        return costs.keySet().stream().filter(c -> c.compareTo(cost) <= 0).min(BigDecimal::compareTo).orElse(null);
-    }
 }

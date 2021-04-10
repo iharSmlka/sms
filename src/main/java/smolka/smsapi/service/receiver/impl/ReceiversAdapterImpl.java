@@ -54,13 +54,14 @@ public class ReceiversAdapterImpl implements ReceiversAdapter {
     }
 
     private ReceiverActivationInfoDto getReceiverActivationWithActualCost(RestReceiver receiver, Country country, ActivationTarget service, BigDecimal cost) throws ReceiverException {
-        ReceiverCostMapDto costMap = receiver.getCostMap(country);
-        BigDecimal minCost = costMap.getMinCost(country, service, cost);
+        ReceiverCostMapDto receiverCostMap = receiver.getCostMap(country);
+        CostMapDto markUppedCostMap = markUpperService.markUpCostMap(mainMapper.mapToInternalCostMap(receiverCostMap));
+        BigDecimal minCost = markUppedCostMap.getMinCost(country.getCountryCode(), service.getServiceCode(), cost);
         if (minCost == null) {
             return null;
         }
         ReceiverActivationInfoDto activationInfoDto = receiver.orderActivation(country, service);
-        activationInfoDto.setCost(markUpperService.markUp(minCost));
+        activationInfoDto.setCost(minCost);
         return activationInfoDto;
     }
 }

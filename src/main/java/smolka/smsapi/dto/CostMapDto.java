@@ -16,18 +16,12 @@ import java.util.Map;
 public class CostMapDto {
     private final Map<String, Map<String, Map<BigDecimal, Integer>>> costMap = new HashMap<>();
 
-    public boolean isExists(Country country, ActivationTarget service, BigDecimal cost) {
-        if (costMap.get(country.getCountryCode()) == null || costMap.get(country.getCountryCode()).get(service.getServiceCode()) == null) {
-            return false;
+    public BigDecimal getMinCost(String country, String service, BigDecimal cost) {
+        if (costMap.get(country) == null || costMap.get(country).get(service) == null) {
+            return null;
         }
-        Map<BigDecimal, Integer> costs = costMap.get(country.getCountryCode()).get(service.getServiceCode());
-        for (BigDecimal costInMap : costs.keySet()) {
-            int compareResult = costInMap.compareTo(cost);
-            if (compareResult == 0 || compareResult < 0) {
-                return true;
-            }
-        }
-        return false;
+        Map<BigDecimal, Integer> costs = costMap.get(country).get(service);
+        return costs.keySet().stream().filter(c -> c.compareTo(cost) <= 0).min(BigDecimal::compareTo).orElse(null);
     }
 
     public void put(String country, String service, BigDecimal cost, Integer count) {

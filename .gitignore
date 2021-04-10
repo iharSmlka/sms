@@ -10,3 +10,7 @@ api.iml
 log.txt
 
 *.jar
+
+out/artifacts/api_jar/apiii.zip
+
+*.zip
