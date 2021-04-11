@@ -12,7 +12,8 @@ public enum Action {
     ACTIVATION_HISTORY("activationHistory"),
     USER_INFO("userInf"),
     CURR_ACTIVATION("activationInf"),
-    CURR_ACTIVATIONS("activationsInf");
+    CURR_ACTIVATIONS("activationsInf"),
+    CHANGE_STATUS("setStatus");
 
     private final String actionName;
 

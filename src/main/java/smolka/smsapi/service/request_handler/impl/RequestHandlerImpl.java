@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import smolka.smsapi.dto.ServiceMessage;
 import smolka.smsapi.dto.input.*;
 import smolka.smsapi.enums.Action;
+import smolka.smsapi.enums.ActivationStatus;
 import smolka.smsapi.enums.SmsConstants;
 import smolka.smsapi.exception.*;
 import smolka.smsapi.service.activation.ActivationHistoryService;
@@ -38,7 +39,7 @@ public class RequestHandlerImpl implements RequestHandler {
     private ObjectMapper objectMapper;
 
     @Override
-    public ServiceMessage<?> handle(String requestBody) throws UserNotFoundException, UserBalanceIsEmptyException, ReceiverException, NoNumbersException, ActivationNotFoundException {
+    public ServiceMessage<?> handle(String requestBody) throws UserNotFoundException, IllegalOperationException, ReceiverException, NoNumbersException, ActivationNotFoundException {
         try {
             ApiRequest apiRequest = objectMapper.readValue(requestBody, ApiRequest.class);
             validate(apiRequest);
@@ -72,12 +73,24 @@ public class RequestHandlerImpl implements RequestHandler {
                 case CURR_ACTIVATIONS: {
                     return createSuccessServiceMessage(currentActivationService.getCurrentActivationsForUser(apiRequest.getApiKey()));
                 }
+                case CHANGE_STATUS: {
+                    ChangeActivationStatusRequest changeActivationStatusRequest = objectMapper.readValue(requestBody, ChangeActivationStatusRequest.class);
+                    validateChangeStatusRequest(changeActivationStatusRequest);
+                    return createSuccessServiceMessage(currentActivationService.setStatusForActivation(changeActivationStatusRequest));
+                }
                 default: {
                     throw new ValidationException("Неизвестная операция");
                 }
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void validateChangeStatusRequest(ChangeActivationStatusRequest changeActivationStatusRequest) {
+        validate(changeActivationStatusRequest);
+        if (!changeActivationStatusRequest.getStatus().equals(ActivationStatus.SUCCEED.getCode()) && !changeActivationStatusRequest.getStatus().equals(ActivationStatus.CLOSED.getCode())) {
+            throw new ValidationException("Попытка выставить некорректный статус " + changeActivationStatusRequest.getStatus());
         }
     }
 

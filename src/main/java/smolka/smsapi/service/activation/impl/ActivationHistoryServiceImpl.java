@@ -57,14 +57,12 @@ public class ActivationHistoryServiceImpl implements ActivationHistoryService {
 
     @Override
     @Transactional
-    public void saveAllCurrentActivationsToHistoryWithStatus(List<CurrentActivation> currentActivations, ActivationStatus status) {
-        List<ActivationHistory> activationHistories = currentActivations.stream().map(curr -> {
-            ActivationHistory activationHistory = mainMapper.mapActivationHistoryFromCurrentActivation(curr);
-            activationHistory.setStatus(status.getCode());
-            activationHistory.setFinishDate(DateTimeUtils.getUtcCurrentLocalDateTime());
-            return activationHistory;
-        }).collect(Collectors.toList());
-        activationHistoryRepository.saveAll(activationHistories);
+    public ActivationHistory saveCurrentActivationToHistoryWithStatus(CurrentActivation currentActivation, ActivationStatus status) {
+        ActivationHistory activationHistory = mainMapper.mapActivationHistoryFromCurrentActivation(currentActivation);
+        activationHistory.setStatus(status.getCode());
+        activationHistory.setFinishDate(DateTimeUtils.getUtcCurrentLocalDateTime());
+        activationHistory = activationHistoryRepository.save(activationHistory);
+        return activationHistory;
     }
 
     @Override

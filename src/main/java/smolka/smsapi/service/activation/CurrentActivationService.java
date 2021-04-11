@@ -1,9 +1,7 @@
 package smolka.smsapi.service.activation;
 
-import smolka.smsapi.dto.ActivationMessageDto;
-import smolka.smsapi.dto.CostMapDto;
-import smolka.smsapi.dto.CurrentActivationCreateInfoDto;
-import smolka.smsapi.dto.CurrentActivationsStatusDto;
+import smolka.smsapi.dto.*;
+import smolka.smsapi.dto.input.ChangeActivationStatusRequest;
 import smolka.smsapi.dto.input.GetActivationRequest;
 import smolka.smsapi.dto.input.GetCostRequest;
 import smolka.smsapi.dto.input.OrderRequest;
@@ -15,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface CurrentActivationService {
-    CurrentActivationCreateInfoDto orderActivation(OrderRequest orderRequest) throws ReceiverException, UserNotFoundException, UserBalanceIsEmptyException, NoNumbersException;
+    CurrentActivationCreateInfoDto orderActivation(OrderRequest orderRequest) throws ReceiverException, UserNotFoundException, IllegalOperationException, NoNumbersException;
 
     ActivationMessageDto getCurrentActivationForUser(GetActivationRequest getActivationRequest) throws ActivationNotFoundException, UserNotFoundException;
 
@@ -26,6 +24,8 @@ public interface CurrentActivationService {
     void setMessageForCurrentActivation(CurrentActivation activation, String message);
 
     List<CurrentActivation> findAllCurrentActivationsWithoutReceivedMessage();
+
+    ChangedStatusDto setStatusForActivation(ChangeActivationStatusRequest changeActivationStatusRequest) throws UserNotFoundException, ActivationNotFoundException;
 
     void closeCurrentActivationsForUser(User user, List<CurrentActivation> activationsForClose);
 

@@ -4,10 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import smolka.smsapi.dto.ActivationMessageDto;
-import smolka.smsapi.dto.CostMapDto;
-import smolka.smsapi.dto.CurrentActivationCreateInfoDto;
-import smolka.smsapi.dto.CurrentActivationsStatusDto;
+import smolka.smsapi.dto.*;
+import smolka.smsapi.dto.input.ChangeActivationStatusRequest;
 import smolka.smsapi.dto.input.GetActivationRequest;
 import smolka.smsapi.dto.input.GetCostRequest;
 import smolka.smsapi.dto.input.OrderRequest;
@@ -15,15 +13,12 @@ import smolka.smsapi.dto.receiver.ReceiverActivationInfoDto;
 import smolka.smsapi.enums.ActivationStatus;
 import smolka.smsapi.exception.*;
 import smolka.smsapi.mapper.MainMapper;
-import smolka.smsapi.model.ActivationTarget;
-import smolka.smsapi.model.Country;
-import smolka.smsapi.model.CurrentActivation;
-import smolka.smsapi.model.User;
+import smolka.smsapi.model.*;
 import smolka.smsapi.repository.ActivationTargetRepository;
 import smolka.smsapi.repository.CountryRepository;
 import smolka.smsapi.repository.CurrentActivationRepository;
-import smolka.smsapi.service.activation.ActivationHistoryService;
 import smolka.smsapi.service.activation.CurrentActivationService;
+import smolka.smsapi.service.sync.ActivationStatusSyncService;
 import smolka.smsapi.service.user.UserService;
 import smolka.smsapi.service.receiver.ReceiversAdapter;
 import smolka.smsapi.service.sync.BalanceSyncService;
@@ -43,8 +38,6 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
     @Autowired
     private CurrentActivationRepository currentActivationRepository;
     @Autowired
-    private ActivationHistoryService activationHistoryService;
-    @Autowired
     private ActivationTargetRepository activationTargetRepository;
     @Autowired
     private CountryRepository countryRepository;
@@ -56,17 +49,19 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
     private UserService userService;
     @Autowired
     private BalanceSyncService balanceSyncService;
+    @Autowired
+    private ActivationStatusSyncService activationStatusSyncService;
 
 
     @Override
-    @Transactional(rollbackFor = { ReceiverException.class, UserNotFoundException.class, UserBalanceIsEmptyException.class, NoNumbersException.class })
-    public CurrentActivationCreateInfoDto orderActivation(OrderRequest orderRequest) throws ReceiverException, UserNotFoundException, UserBalanceIsEmptyException, NoNumbersException {
+    @Transactional(rollbackFor = { ReceiverException.class, UserNotFoundException.class, IllegalOperationException.class, NoNumbersException.class })
+    public CurrentActivationCreateInfoDto orderActivation(OrderRequest orderRequest) throws ReceiverException, UserNotFoundException, IllegalOperationException, NoNumbersException {
         User user = userService.findUserByUserKey(orderRequest.getApiKey());
         if (user == null) {
             throw new UserNotFoundException("Данного юзера не существует");
         }
         if (!balanceSyncService.orderIsPossible(user, orderRequest.getCost())) {
-            throw new UserBalanceIsEmptyException("Не хватает денег");
+            throw new IllegalOperationException("Не хватает денег");
         }
         ActivationTarget service = activationTargetRepository.findByServiceCode(orderRequest.getService());
         Country country = countryRepository.findByCountryCode(orderRequest.getCountry());
@@ -126,14 +121,41 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
 
     @Override
     @Transactional
+    public ChangedStatusDto setStatusForActivation(ChangeActivationStatusRequest changeActivationStatusRequest) throws UserNotFoundException, ActivationNotFoundException {
+        User user = userService.findUserByUserKey(changeActivationStatusRequest.getApiKey());
+        if (user == null) {
+            throw new UserNotFoundException("Данного юзера не существует");
+        }
+        ActivationHistory activationHistory = null;
+        if (ActivationStatus.SUCCEED.getCode().equals(changeActivationStatusRequest.getStatus())) {
+            activationHistory = activationStatusSyncService.setSucceedActivationStatusAndAddToHistoryById(changeActivationStatusRequest.getId());
+            balanceSyncService.subFromFreeze(user, activationHistory.getCost());
+        }
+        if (ActivationStatus.CLOSED.getCode().equals(changeActivationStatusRequest.getStatus())) {
+            activationHistory = activationStatusSyncService.setClosedActivationStatusAndAddToHistoryById(changeActivationStatusRequest.getId());
+            balanceSyncService.subFromFreezeAndAddToRealBalance(user, activationHistory.getCost());
+        }
+        if (activationHistory == null) {
+            throw new ActivationNotFoundException("Такой активации не существует");
+        }
+        return ChangedStatusDto.builder().status(changeActivationStatusRequest.getStatus()).build();
+    }
+
+    @Override
+    @Transactional
     public void closeCurrentActivationsForUser(User user, List<CurrentActivation> activationsForClose) {
         if (activationsForClose.isEmpty()) {
             return;
         }
-        activationHistoryService.saveAllCurrentActivationsToHistoryWithStatus(activationsForClose, ActivationStatus.CLOSED);
-        currentActivationRepository.deleteAll(activationsForClose);
-        BigDecimal sum = activationsForClose.stream()
-                .map(CurrentActivation::getCost)
+        List<ActivationHistory> activationHistories = new ArrayList<>();
+        for (CurrentActivation currentActivation : activationsForClose) {
+            ActivationHistory activationHistory = activationStatusSyncService.setClosedActivationStatusAndAddToHistoryById(currentActivation.getId());
+            if (activationHistory != null) {
+                activationHistories.add(activationHistory);
+            }
+        }
+        BigDecimal sum = activationHistories.stream()
+                .map(ActivationHistory::getCost)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         balanceSyncService.subFromFreezeAndAddToRealBalance(user, sum);
     }
@@ -144,10 +166,15 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
         if (activationsForSucceed.isEmpty()) {
             return;
         }
-        activationHistoryService.saveAllCurrentActivationsToHistoryWithStatus(activationsForSucceed, ActivationStatus.SUCCEED);
-        currentActivationRepository.deleteAll(activationsForSucceed);
-        BigDecimal sum = activationsForSucceed.stream()
-                .map(CurrentActivation::getCost)
+        List<ActivationHistory> activationHistories = new ArrayList<>();
+        for (CurrentActivation currentActivation : activationsForSucceed) {
+            ActivationHistory activationHistory = activationStatusSyncService.setSucceedActivationStatusAndAddToHistoryById(currentActivation.getId());
+            if (activationHistory != null) {
+                activationHistories.add(activationHistory);
+            }
+        }
+        BigDecimal sum = activationHistories.stream()
+                .map(ActivationHistory::getCost)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         balanceSyncService.subFromFreeze(user, sum);
     }

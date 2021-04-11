@@ -22,7 +22,7 @@ public class ApiController {
     }
 
     @PostMapping
-    public ServiceMessage<?> postProceed(@RequestBody String requestBody) throws UserNotFoundException, UserBalanceIsEmptyException, ActivationNotFoundException, ReceiverException, NoNumbersException {
+    public ServiceMessage<?> postProceed(@RequestBody String requestBody) throws UserNotFoundException, IllegalOperationException, ActivationNotFoundException, ReceiverException, NoNumbersException {
         return requestHandler.handle(requestBody);
     }
 }

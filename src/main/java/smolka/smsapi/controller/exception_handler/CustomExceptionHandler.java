@@ -38,8 +38,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(serviceMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(UserBalanceIsEmptyException.class)
-    public ResponseEntity<ServiceMessage<String>> handle(UserBalanceIsEmptyException e) {
+    @ExceptionHandler(IllegalOperationException.class)
+    public ResponseEntity<ServiceMessage<String>> handle(IllegalOperationException e) {
         logger.error("Баланс юзера пуст", e);
         ServiceMessage<String> serviceMessage = new ServiceMessage<>(SmsConstants.ERROR_STATUS.getValue(), SmsConstants.USER_BALANCE_IS_EMPTY_MSG.getValue());
         return new ResponseEntity<>(serviceMessage, HttpStatus.INTERNAL_SERVER_ERROR);
