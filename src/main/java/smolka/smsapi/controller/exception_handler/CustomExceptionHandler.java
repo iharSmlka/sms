@@ -41,7 +41,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(IllegalOperationException.class)
     public ResponseEntity<ServiceMessage<String>> handle(IllegalOperationException e) {
         logger.error("Баланс юзера пуст", e);
-        ServiceMessage<String> serviceMessage = new ServiceMessage<>(SmsConstants.ERROR_STATUS.getValue(), SmsConstants.USER_BALANCE_IS_EMPTY_MSG.getValue());
+        ServiceMessage<String> serviceMessage = new ServiceMessage<>(SmsConstants.ERROR_STATUS.getValue(), SmsConstants.ILLEGAL_OPERATION.getValue());
         return new ResponseEntity<>(serviceMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

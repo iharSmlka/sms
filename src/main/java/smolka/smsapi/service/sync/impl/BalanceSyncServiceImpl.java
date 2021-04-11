@@ -42,7 +42,7 @@ public class BalanceSyncServiceImpl extends AbstractSyncService<Long> implements
 
     @Override
     @Transactional
-    public void addBalance(User user, BigDecimal sum) {
+    public void addBalance(User user, BigDecimal sum) throws Throwable {
         BalanceWorker<User> balanceUpdater = new BalanceWorker<User>(this, user, sum) {
             @Override
             protected User logic() throws Exception {
@@ -60,7 +60,7 @@ public class BalanceSyncServiceImpl extends AbstractSyncService<Long> implements
 
     @Override
     @Transactional
-    public Boolean orderIsPossible(User user, BigDecimal orderCost) {
+    public Boolean orderIsPossible(User user, BigDecimal orderCost) throws Throwable {
         BalanceWorker<Boolean> balanceChecker = new BalanceWorker<Boolean>(this, user, orderCost) {
             @Override
             protected Boolean logic() throws Exception {
@@ -76,7 +76,7 @@ public class BalanceSyncServiceImpl extends AbstractSyncService<Long> implements
 
     @Override
     @Transactional
-    public void subFromRealBalanceAndAddToFreeze(User user, BigDecimal sum) {
+    public void subFromRealBalanceAndAddToFreeze(User user, BigDecimal sum) throws Throwable {
         BalanceWorker<User> balanceUpdater = new BalanceWorker<User>(this, user, sum) {
             @Override
             protected User logic() throws Exception {
@@ -98,7 +98,7 @@ public class BalanceSyncServiceImpl extends AbstractSyncService<Long> implements
 
     @Override
     @Transactional
-    public void subFromFreezeAndAddToRealBalance(User user, BigDecimal sum) {
+    public void subFromFreezeAndAddToRealBalance(User user, BigDecimal sum) throws Throwable {
         BalanceWorker<User> balanceUpdater = new BalanceWorker<User>(this, user, sum) {
             @Override
             protected User logic() throws Exception {
@@ -120,7 +120,7 @@ public class BalanceSyncServiceImpl extends AbstractSyncService<Long> implements
 
     @Override
     @Transactional
-    public void subFromFreeze(User user, BigDecimal sum) {
+    public void subFromFreeze(User user, BigDecimal sum) throws Throwable {
         BalanceWorker<User> balanceUpdater = new BalanceWorker<User>(this, user, sum) {
             @Override
             protected User logic() throws Exception {

@@ -55,7 +55,7 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
 
     @Override
     @Transactional(rollbackFor = { ReceiverException.class, UserNotFoundException.class, IllegalOperationException.class, NoNumbersException.class })
-    public CurrentActivationCreateInfoDto orderActivation(OrderRequest orderRequest) throws ReceiverException, UserNotFoundException, IllegalOperationException, NoNumbersException {
+    public CurrentActivationCreateInfoDto orderActivation(OrderRequest orderRequest) throws Throwable {
         User user = userService.findUserByUserKey(orderRequest.getApiKey());
         if (user == null) {
             throw new UserNotFoundException("Данного юзера не существует");
@@ -108,7 +108,7 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
 
     @Override
     @Transactional
-    public void setMessageForCurrentActivation(CurrentActivation activation, String message) {
+    public void setMessageForCurrentActivation(CurrentActivation activation, String message) throws Throwable {
         activationStatusSyncService.setMessageForActivation(activation, message);
     }
 
@@ -119,7 +119,7 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
 
     @Override
     @Transactional
-    public ChangedStatusDto setStatusForActivation(ChangeActivationStatusRequest changeActivationStatusRequest) throws UserNotFoundException, ActivationNotFoundException {
+    public ChangedStatusDto setStatusForActivation(ChangeActivationStatusRequest changeActivationStatusRequest) throws Throwable {
         User user = userService.findUserByUserKey(changeActivationStatusRequest.getApiKey());
         if (user == null) {
             throw new UserNotFoundException("Данного юзера не существует");
@@ -141,7 +141,7 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
 
     @Override
     @Transactional
-    public void closeCurrentActivationsForUser(User user, List<CurrentActivation> activationsForClose) {
+    public void closeCurrentActivationsForUser(User user, List<CurrentActivation> activationsForClose) throws Throwable {
         if (activationsForClose.isEmpty()) {
             return;
         }
@@ -160,7 +160,7 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
 
     @Override
     @Transactional
-    public void succeedCurrentActivationsForUser(User user, List<CurrentActivation> activationsForSucceed) {
+    public void succeedCurrentActivationsForUser(User user, List<CurrentActivation> activationsForSucceed) throws Throwable {
         if (activationsForSucceed.isEmpty()) {
             return;
         }

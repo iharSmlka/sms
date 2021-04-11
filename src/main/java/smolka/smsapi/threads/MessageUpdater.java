@@ -35,12 +35,12 @@ public class MessageUpdater extends ThreadService {
     }
 
     @Override
-    protected void step() throws ReceiverException {
+    protected void step() throws Throwable {
         setMessageForActivationsStep();
         closeExpiredActivationsStep();
     }
 
-    private void setMessageForActivationsStep() throws ReceiverException {
+    private void setMessageForActivationsStep() throws Throwable {
         List<CurrentActivation> currentActivations = currentActivationService.findAllCurrentActivationsWithoutReceivedMessage();
         CommonReceiversActivationInfoMap receiverActivationInfoMap = receiversAdapter.getReceiversCurrentActivations();
         for (CurrentActivation activation : currentActivations) {
@@ -55,7 +55,7 @@ public class MessageUpdater extends ThreadService {
         }
     }
 
-    private void closeExpiredActivationsStep() {
+    private void closeExpiredActivationsStep() throws Throwable {
         Map<User, List<CurrentActivation>> expiredActivationsPerUser = currentActivationService.findAllCurrentExpiredActivationsForUsers();
         for (User user : expiredActivationsPerUser.keySet()) {
             List<CurrentActivation> allExpiredActivations = expiredActivationsPerUser.get(user);

@@ -39,7 +39,7 @@ public class RequestHandlerImpl implements RequestHandler {
     private ObjectMapper objectMapper;
 
     @Override
-    public ServiceMessage<?> handle(String requestBody) throws UserNotFoundException, IllegalOperationException, ReceiverException, NoNumbersException, ActivationNotFoundException {
+    public ServiceMessage<?> handle(String requestBody) throws Throwable {
         try {
             ApiRequest apiRequest = objectMapper.readValue(requestBody, ApiRequest.class);
             validate(apiRequest);

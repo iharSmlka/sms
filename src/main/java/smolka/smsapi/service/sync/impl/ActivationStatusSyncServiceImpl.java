@@ -72,19 +72,19 @@ public class ActivationStatusSyncServiceImpl extends AbstractSyncService<Long> i
 
     @Override
     @Transactional
-    public void setMessageForActivation(CurrentActivation activation, String msg) {
+    public void setMessageForActivation(CurrentActivation activation, String msg) throws Throwable {
         getResult(new ActivationMessageWorker(this, activation, msg), activation.getId());
     }
 
     @Override
     @Transactional
-    public ActivationHistory setSucceedActivationStatusAndAddToHistoryById(Long id) {
+    public ActivationHistory setSucceedActivationStatusAndAddToHistoryById(Long id) throws Throwable {
        return getResult(new ActivationHistoryStatusWorker(this, id, ActivationStatus.SUCCEED), id);
     }
 
     @Override
     @Transactional
-    public ActivationHistory setClosedActivationStatusAndAddToHistoryById(Long id) {
+    public ActivationHistory setClosedActivationStatusAndAddToHistoryById(Long id) throws Throwable {
         return getResult(new ActivationHistoryStatusWorker(this, id, ActivationStatus.CLOSED), id);
     }
 }

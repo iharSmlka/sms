@@ -1,6 +1,7 @@
 package smolka.smsapi.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class QiwiNotificationController {
         private final QiwiBillNotificationRequest qiwiBillNotificationBody;
         private final String signature;
 
+        @SneakyThrows
         @Override
         public void run() {
             try {

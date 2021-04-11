@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import smolka.smsapi.dto.ServiceMessage;
-import smolka.smsapi.exception.*;
 import smolka.smsapi.service.request_handler.RequestHandler;
 
 @RestController
@@ -22,7 +21,7 @@ public class ApiController {
     }
 
     @PostMapping
-    public ServiceMessage<?> postProceed(@RequestBody String requestBody) throws UserNotFoundException, IllegalOperationException, ActivationNotFoundException, ReceiverException, NoNumbersException {
+    public ServiceMessage<?> postProceed(@RequestBody String requestBody) throws Throwable {
         return requestHandler.handle(requestBody);
     }
 }

@@ -24,11 +24,11 @@ public abstract class ThreadService extends Thread {
             try {
                 Thread.sleep(delaySec * 1000);
                 step();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.error("Ошибка в MessageUpdater ", e);
             }
         }
     }
 
-    protected abstract void step() throws Exception;
+    protected abstract void step() throws Throwable;
 }

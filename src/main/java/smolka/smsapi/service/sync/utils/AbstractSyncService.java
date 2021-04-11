@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -40,14 +41,17 @@ public class AbstractSyncService <ID> {
     private final Map<ID, SyncBlock> workersSyncMap = new ConcurrentHashMap<>();
     private final Lock mapLocker = new ReentrantLock();
 
-    protected  <T> T getResult(Worker<ID, T> worker, ID id) {
+    protected  <T> T getResult(Worker<ID, T> worker, ID id) throws Throwable {
         try {
             putInMapOrIncLockerCount(id);
             FutureTask<T> futureResult = new FutureTask<T>(worker);
             new Thread(futureResult).start();
             return futureResult.get();
-        } catch (Exception exc) {
-            throw new RuntimeException(exc); // TODO: подрефакторить это!!!
+        } catch (ExecutionException | InterruptedException exc) {
+            if (exc instanceof ExecutionException) {
+                throw ((ExecutionException)exc).getCause();
+            }
+            throw exc; // TODO: подрефакторить это!!!
         }
     }
 

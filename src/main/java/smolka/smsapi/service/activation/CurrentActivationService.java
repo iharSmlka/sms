@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface CurrentActivationService {
-    CurrentActivationCreateInfoDto orderActivation(OrderRequest orderRequest) throws ReceiverException, UserNotFoundException, IllegalOperationException, NoNumbersException;
+    CurrentActivationCreateInfoDto orderActivation(OrderRequest orderRequest) throws Throwable;
 
     ActivationMessageDto getCurrentActivationForUser(GetActivationRequest getActivationRequest) throws ActivationNotFoundException, UserNotFoundException;
 
@@ -21,15 +21,15 @@ public interface CurrentActivationService {
 
     CostMapDto getCostsForActivations(GetCostRequest costRequest) throws ReceiverException, UserNotFoundException;
 
-    void setMessageForCurrentActivation(CurrentActivation activation, String message);
+    void setMessageForCurrentActivation(CurrentActivation activation, String message) throws Throwable;
 
     List<CurrentActivation> findAllCurrentActivationsWithoutReceivedMessage();
 
-    ChangedStatusDto setStatusForActivation(ChangeActivationStatusRequest changeActivationStatusRequest) throws UserNotFoundException, ActivationNotFoundException;
+    ChangedStatusDto setStatusForActivation(ChangeActivationStatusRequest changeActivationStatusRequest) throws Throwable;
 
-    void closeCurrentActivationsForUser(User user, List<CurrentActivation> activationsForClose);
+    void closeCurrentActivationsForUser(User user, List<CurrentActivation> activationsForClose) throws Throwable;
 
-    void succeedCurrentActivationsForUser(User user, List<CurrentActivation> activationsForSucceed);
+    void succeedCurrentActivationsForUser(User user, List<CurrentActivation> activationsForSucceed) throws Throwable;
 
     Map<User, List<CurrentActivation>> findAllCurrentExpiredActivationsForUsers();
 }
