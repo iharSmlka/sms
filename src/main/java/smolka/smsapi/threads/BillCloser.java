@@ -10,34 +10,17 @@ import javax.annotation.PostConstruct;
 
 @Service
 @Slf4j
-public class BillCloser extends Thread {
-
-    @Value(value = "${sms.api.bill-closer-delay}")
-    private Integer delay;
+public class BillCloser extends ThreadService {
 
     @Autowired
-    private BillService billService;
+    private final BillService billService;
 
-    @PostConstruct
-    public void initialize() {
-        this.start();
+    public BillCloser(@Value(value = "${sms.api.bill-closer-delay}") Integer delaySec, BillService billService) {
+        super(delaySec);
+        this.billService = billService;
     }
 
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                Thread.sleep(delay * 1000);
-                step();
-            } catch (Exception e) {
-                log.error("Ошибка в BillCloser ", e);
-                break;
-            }
-        }
-        log.error("Умер BillCloser");
-    }
-
-    private void step() {
+    protected void step() {
         billService.closeAllStaleBills();
     }
 }

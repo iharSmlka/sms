@@ -20,32 +20,24 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class MessageUpdater extends Thread {
-
-    @Value(value = "${sms.api.update-message-checker-delay-secs}")
-    private Integer delay;
+public class MessageUpdater extends ThreadService {
 
     @Autowired
-    private CurrentActivationService currentActivationService;
+    private final CurrentActivationService currentActivationService;
 
     @Autowired
-    private ReceiversAdapter receiversAdapter;
+    private final ReceiversAdapter receiversAdapter;
 
-    @PostConstruct
-    public void initialize() {
-        this.start();
+    public MessageUpdater(@Value(value = "${sms.api.update-message-checker-delay-secs}") Integer delaySec, CurrentActivationService currentActivationService, ReceiversAdapter receiversAdapter) {
+        super(delaySec);
+        this.currentActivationService = currentActivationService;
+        this.receiversAdapter = receiversAdapter;
     }
 
     @Override
-    public void run() {
-        while (true) {
-            try {
-                Thread.sleep(delay * 1000);
-                step();
-            } catch (Exception e) {
-                log.error("Ошибка в MessageUpdater ", e);
-            }
-        }
+    protected void step() throws ReceiverException {
+        setMessageForActivationsStep();
+        closeExpiredActivationsStep();
     }
 
     private void setMessageForActivationsStep() throws ReceiverException {
@@ -79,10 +71,5 @@ public class MessageUpdater extends Thread {
             currentActivationService.succeedCurrentActivationsForUser(user, activationsForSucceed);
             currentActivationService.closeCurrentActivationsForUser(user, activationsForClose);
         }
-    }
-
-    private void step() throws ReceiverException {
-        setMessageForActivationsStep();
-        closeExpiredActivationsStep();
     }
 }
