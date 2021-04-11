@@ -18,12 +18,33 @@ import javax.transaction.Transactional;
 public class ActivationStatusSyncServiceImpl extends AbstractSyncService<Long> implements ActivationStatusSyncService {
 
     @AllArgsConstructor
-    private class ActivationStatusWorker extends Worker<Long, ActivationHistory> {
+    private class ActivationMessageWorker extends Worker<Long, CurrentActivation> {
+
+        private CurrentActivation activation;
+        private final String msg;
+
+        public ActivationMessageWorker(AbstractSyncService<Long> syncServ, CurrentActivation activation, String msg) {
+            super(syncServ, activation.getId());
+            this.activation = activation;
+            this.msg = msg;
+        }
+
+        @Override
+        protected CurrentActivation logic() throws Exception {
+            activation.setMessage(msg);
+            activation.setStatus(ActivationStatus.SMS_RECEIVED.getCode());
+            activation = activationRepository.save(activation);
+            return activation;
+        }
+    }
+
+    @AllArgsConstructor
+    private class ActivationHistoryStatusWorker extends Worker<Long, ActivationHistory> {
 
         private final Long id;
         private final ActivationStatus status;
 
-        public ActivationStatusWorker(AbstractSyncService<Long> syncServ, Long id, ActivationStatus status) {
+        public ActivationHistoryStatusWorker(AbstractSyncService<Long> syncServ, Long id, ActivationStatus status) {
             super(syncServ, id);
             this.id = id;
             this.status = status;
@@ -51,13 +72,19 @@ public class ActivationStatusSyncServiceImpl extends AbstractSyncService<Long> i
 
     @Override
     @Transactional
+    public void setMessageForActivation(CurrentActivation activation, String msg) {
+        getResult(new ActivationMessageWorker(this, activation, msg), activation.getId());
+    }
+
+    @Override
+    @Transactional
     public ActivationHistory setSucceedActivationStatusAndAddToHistoryById(Long id) {
-       return getResult(new ActivationStatusWorker(this, id, ActivationStatus.SUCCEED), id);
+       return getResult(new ActivationHistoryStatusWorker(this, id, ActivationStatus.SUCCEED), id);
     }
 
     @Override
     @Transactional
     public ActivationHistory setClosedActivationStatusAndAddToHistoryById(Long id) {
-        return getResult(new ActivationStatusWorker(this, id, ActivationStatus.CLOSED), id);
+        return getResult(new ActivationHistoryStatusWorker(this, id, ActivationStatus.CLOSED), id);
     }
 }

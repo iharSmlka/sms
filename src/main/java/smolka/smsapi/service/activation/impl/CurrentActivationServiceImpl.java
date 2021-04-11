@@ -109,9 +109,7 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
     @Override
     @Transactional
     public void setMessageForCurrentActivation(CurrentActivation activation, String message) {
-        activation.setMessage(message);
-        activation.setStatus(ActivationStatus.SMS_RECEIVED.getCode());
-        currentActivationRepository.save(activation);
+        activationStatusSyncService.setMessageForActivation(activation, message);
     }
 
     @Override
