@@ -24,4 +24,21 @@ public class ReceiverCostMapDto {
         costMap.get(country).computeIfAbsent(service, k -> new HashMap<>());
         costMap.get(country).get(service).put(cost, count);
     }
+
+    public ReceiverCostMapDto cutForCountry(Country country) {
+        if (country == null) {
+            return this;
+        }
+        ReceiverCostMapDto receiverCostMapDto = new ReceiverCostMapDto();
+        Map<ActivationTarget, Map<BigDecimal, Integer>> countrySegment = costMap.get(country);
+        if (countrySegment == null) {
+            return receiverCostMapDto;
+        }
+        for (ActivationTarget target : countrySegment.keySet()) {
+            for (BigDecimal cost : countrySegment.get(target).keySet()) {
+                receiverCostMapDto.addCostToMap(country, target, cost, countrySegment.get(target).get(cost));
+            }
+        }
+        return receiverCostMapDto;
+    }
 }

@@ -13,12 +13,22 @@ import smolka.smsapi.model.Country;
 public class SmsHubRequestCreator {
 
     private static final String ORDER_ACTION_NAME = "getNumber";
+    private static final String SET_STATUS_ACTION_NAME = "setStatus";
     private static final String COST_MAP_ACTION_NAME = "getPrices";
     private static final String API_KEY_FORM_DATA_PROP_NAME = "api_key";
     private static final String ACTION_FORM_DATA_PROP_NAME = "action";
     private static final String SERVICE_FORM_DATA_PROP_NAME = "service";
     private static final String OPERATOR_FORM_DATA_PROP_NAME = "operator";
     private static final String COUNTRY_FORM_DATA_PROP_NAME = "country";
+    private static final String ACT_ID_FORM_DATA_PROP_NAME = "id";
+    private static final String ACT_STATUS_FORM_DATA_PROP_NAME = "status";
+
+    public static HttpEntity<MultiValueMap<String, String>> createChangeStatusRequest(String apiKey, Long id, Integer status) {
+        MultiValueMap<String, String> map = createStandardMultiValueMap(apiKey, SET_STATUS_ACTION_NAME);
+        map.add(ACT_ID_FORM_DATA_PROP_NAME, id.toString());
+        map.add(ACT_STATUS_FORM_DATA_PROP_NAME, status.toString());
+        return new HttpEntity<>(map, createStandardHeaders());
+    }
 
     public static HttpEntity<MultiValueMap<String, String>> createOrderRequest(String apiKey, Country country, ActivationTarget service) {
         final String operator = "any";
@@ -29,11 +39,8 @@ public class SmsHubRequestCreator {
         return new HttpEntity<>(map, createStandardHeaders());
     }
 
-    public static HttpEntity<MultiValueMap<String, String>> createCostMapRequest(String apiKey, Country country) {
+    public static HttpEntity<MultiValueMap<String, String>> createCostMapRequest(String apiKey) {
         MultiValueMap<String, String> map = createStandardMultiValueMap(apiKey, COST_MAP_ACTION_NAME);
-        if (country != null) {
-            map.add(COUNTRY_FORM_DATA_PROP_NAME, country.getSmshubCountryCode());
-        }
         return new HttpEntity<>(map, createStandardHeaders());
     }
 

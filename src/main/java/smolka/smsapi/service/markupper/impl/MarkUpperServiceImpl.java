@@ -53,7 +53,7 @@ public class MarkUpperServiceImpl implements MarkUpperService {
                 }
             }
         }
-        return costMapDto;
+        return newCostMapDto;
     }
 
     @Override

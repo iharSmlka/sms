@@ -1,6 +1,7 @@
 package smolka.smsapi.service.sync.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import smolka.smsapi.enums.ActivationStatus;
@@ -15,6 +16,7 @@ import smolka.smsapi.service.sync.utils.AbstractSyncService;
 import javax.transaction.Transactional;
 
 @Service
+@Slf4j
 public class ActivationStatusSyncServiceImpl extends AbstractSyncService<Long> implements ActivationStatusSyncService {
 
     @AllArgsConstructor

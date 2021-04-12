@@ -1,5 +1,6 @@
 package smolka.smsapi.service.activation.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class CurrentActivationServiceImpl implements CurrentActivationService {
 
     @Value("${sms.api.minutes_for_activation:20}")
@@ -124,13 +126,19 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
         if (user == null) {
             throw new UserNotFoundException("Данного юзера не существует");
         }
+        CurrentActivation currentActivation = currentActivationRepository.findById(changeActivationStatusRequest.getId()).orElse(null);
+        if (currentActivation == null) {
+            throw new ActivationNotFoundException("Данной активации не существует");
+        }
         ActivationHistory activationHistory = null;
         if (ActivationStatus.SUCCEED.getCode().equals(changeActivationStatusRequest.getStatus())) {
-            activationHistory = activationStatusSyncService.setSucceedActivationStatusAndAddToHistoryById(changeActivationStatusRequest.getId());
+            activationHistory = activationStatusSyncService.setSucceedActivationStatusAndAddToHistoryById(currentActivation.getId());
+            closeOnReceiver(currentActivation, ActivationStatus.SUCCEED);
             balanceSyncService.subFromFreeze(user, activationHistory.getCost());
         }
         if (ActivationStatus.CLOSED.getCode().equals(changeActivationStatusRequest.getStatus())) {
-            activationHistory = activationStatusSyncService.setClosedActivationStatusAndAddToHistoryById(changeActivationStatusRequest.getId());
+            activationHistory = activationStatusSyncService.setClosedActivationStatusAndAddToHistoryById(currentActivation.getId());
+            closeOnReceiver(currentActivation, ActivationStatus.CLOSED);
             balanceSyncService.subFromFreezeAndAddToRealBalance(user, activationHistory.getCost());
         }
         if (activationHistory == null) {
@@ -187,5 +195,20 @@ public class CurrentActivationServiceImpl implements CurrentActivationService {
             resultMap.get(userForActivation).add(activation);
         }
         return resultMap;
+    }
+
+    private void closeOnReceiver(CurrentActivation activation, ActivationStatus status) {
+        try {
+            switch (status) {
+                case SUCCEED: {
+                    receiversAdapter.succeedActivation(activation);
+                }
+                case CLOSED: {
+                    receiversAdapter.closeActivation(activation);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при проставлении статуса не ресивере ", e);
+        }
     }
 }

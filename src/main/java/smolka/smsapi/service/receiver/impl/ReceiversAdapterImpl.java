@@ -12,6 +12,7 @@ import smolka.smsapi.exception.ReceiverException;
 import smolka.smsapi.mapper.MainMapper;
 import smolka.smsapi.model.ActivationTarget;
 import smolka.smsapi.model.Country;
+import smolka.smsapi.model.CurrentActivation;
 import smolka.smsapi.service.markupper.MarkUpperService;
 import smolka.smsapi.service.receiver.ReceiversAdapter;
 import smolka.smsapi.service.receiver.RestReceiver;
@@ -28,6 +29,26 @@ public class ReceiversAdapterImpl implements ReceiversAdapter {
     private MainMapper mainMapper;
     @Autowired
     private MarkUpperService markUpperService;
+
+    @Override
+    public boolean closeActivation(CurrentActivation activation) throws ReceiverException {
+        switch (activation.getSource()) {
+            case SMSHUB: {
+                return smsHubReceiver.closeActivation(activation.getSourceId());
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean succeedActivation(CurrentActivation activation) throws ReceiverException {
+        switch (activation.getSource()) {
+            case SMSHUB: {
+                return smsHubReceiver.succeedActivation(activation.getSourceId());
+            }
+        }
+        return false;
+    }
 
     @Override
     public CostMapDto getCommonCostMap(Country country) throws ReceiverException {
